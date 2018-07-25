@@ -1,0 +1,48 @@
+2017/01/31
+
+[x] - Check normalization option
+- GUI: Statistical tests
+- Plot function (GUI: Setting plot parameters in plot func), automatic plot.
+[x] - GUI: Add folder tree automatically
+- Debug "add folder tree": 1st id for groups, 2nd id for subs. Right now, no counting for 2nd id?!
+- GUI: Start with "Group" only(?)
+[x] - Add "Sets" to store various analysis "of the same"
+[x] - Look up different sets to see if calculations have been done before
+- Add "prüfsumme" to check if update is necessary.
+- GUI: Tidy save/load: read and save all parameters/settings from/to input_data 
+- Help: F1 for all functions
+- Help: (re-)write manual
+- GUI: "Interactive" help (? tooltips)
+- GUI: "Pre-Defined" analysis (PNAS scripts?)
+- Add functions (.................................)
+[x] - GUI: Add statistics "pool"
+- GUI: Store/show previous options
+- Move "normalization" from options to plot_mode
+- GUI: "Optiontree": Only show options if other options are set beforehand (e.g., kds bandwidth only for method "ksdensity").
+- Input txt-file
+- (GUI) Check format of input trajectory 
+[x] - GUI: Plot_mode simplify choose indices
+- GUI: Plot hold/new figure for maps, subfigs(?)
+[x] - GUI: Plot_mode, choose rows.
+- GUI: Advanced options for loadData
+- GUI/not-GUI option for not overlapping bins for time 
+- GUI/not-GUI: Results (Distr) only for distributions
+- Internal funcinfo works for one trial only! E.g., difficult to compare different group sizes. 
+- Implement configuration with autocombs+hist+xaxis=days,... in order to caclulate P(# nbs) vs. days etc.
+[x] - GUI: Keep count of number of sets for each function (right now, if one function has 5 sets, 5 (maybe empty) sets will show up for every function)
+- GUI: Option Default/Reset button.
+- GUI: Option table: Inf? (e.g., timeintervals cannot be set to "Inf" once changed)
+- GUI: Trajectory table clear!
+- GUI: Close UI closes all figures
+- GUI: Sets corrsponding to actual figure are highlighted. Incompatible sets are "un-enabled". "Set"-Buttons are like push-buttons: When pressed again, data is removed from figure. 
+- GUI: Plot: Recover std+sem handles after openfig.
+- GUI/all: clear function results.(?)
+- GUI/all: Remove/deal with figures of deleted sets
+- GUI: "Script mode": choose all parameters and analyses, press button and run!
+- Distance swauam
+- versus frames
+- preprocessing protocol
+- length scale
+- !!! Territories/heatmaps
+- Sets mit namen
+- 
