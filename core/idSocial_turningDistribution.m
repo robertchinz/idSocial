@@ -90,7 +90,7 @@ speeddistributionCell=mat2cell(speeddistribution,ones(1,no_fish),ones(1,no_fish)
 %%
 fstack=dbstack(3);
 funcinfo.Function = mfilename;
-funcinfo.callerFunction = fstack(1).name;
+if ~isempty(fstack); funcinfo.callerFunction = fstack(1).name; end
 funcinfo.no_fish = no_fish;
 funcinfo.XTick = edges(1:end-1);
 funcinfo.XTickLabel = cellfun(@(x) strtrim(x),cellstr((num2str(edges(1:end-1)')))','UniformOutput',false);

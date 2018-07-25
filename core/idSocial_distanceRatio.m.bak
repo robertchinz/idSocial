@@ -95,7 +95,7 @@ distnceHist=mat2cell(distnceHist,ones(1,no_fish),ones(1,no_fish),ones(1,no_bins)
 
 fstack=dbstack(3);
 funcinfo.Function = mfilename;
-if ~isempty(fstack); funcinfo.callerFunction = fstack(1).name; end
+funcinfo.callerFunction = fstack(1).name;
 funcinfo.no_fish = no_fish;
 funcinfo.XTick = ctrs;
 funcinfo.XTickLabel = cellstr(num2str(ctrs'+1))';

@@ -1,6 +1,5 @@
-function [speeddistribution, speed_median,speed_mode,inbins,speed,funcinfo]=idSocial_speedDistribution(tr,edges,framerate,bodylength,normalization,method,kds_bandwidth)
+function [accdistribution, acc_median,acc_mode,inbins,acc,funcinfo]=idSocial_accelerationDistribution(tr,edges,framerate,bodylength,normalization,method,kds_bandwidth)
 % Calculates distance distributions
-
 
 if nargin<2 || isempty(edges)
     edges=0:1:10;
@@ -12,9 +11,6 @@ if nargin<4 || isempty(bodylength)
     bodylength=1;
 end
 
-if nargin<4 || isempty(bodylength)
-    bodylength=1;
-end
 if nargin<5 || isempty(normalization)
     normalization='density';
 end
@@ -32,25 +28,25 @@ rand_check = idSocial_auxiliaries_trRandCheck(tr);
 
 
 no_bins=size(edges,2)-1;
-speeddistribution=NaN(no_fish,no_fish,no_bins);
-speed_median=NaN(no_fish,no_fish);
-speed_mode=NaN(no_fish,no_fish);
+accdistribution=NaN(no_fish,no_fish,no_bins);
+acc_median=NaN(no_fish,no_fish);
+acc_mode=NaN(no_fish,no_fish);
 inbins=cell(no_fish,no_fish,no_bins);
-speed=permute(sqrt(sum(vel.^2,4))/bodylength*framerate,[2 3 1]);
+acc=permute(sqrt(sum(acc.^2,4))/bodylength*framerate,[2 3 1]);
 
 for ff=1:no_fish
     for nf=1:no_fish
 %         if ff~=nf
-            val=squeeze(speed(ff,nf,:));
+            val=squeeze(acc(ff,nf,:));
             if strcmpi(method,'hist')
                 [hitemp,bins]=histc(val,edges);
                 switch normalization
                     case 'density'
-                        speeddistribution(ff,nf,:)=hitemp(1:end-1)/no_frames/(edges(2)-edges(1));
+                        accdistribution(ff,nf,:)=hitemp(1:end-1)/no_frames/(edges(2)-edges(1));
                     case 'no_frames'
-                        speeddistribution(ff,nf,:)=hitemp(1:end-1)/no_frames;
+                        accdistribution(ff,nf,:)=hitemp(1:end-1)/no_frames;
                     case 'none'
-                        speeddistribution(ff,nf,:)=hitemp(1:end-1);
+                        accdistribution(ff,nf,:)=hitemp(1:end-1);
                 end
                 if ~all(bins==0)
                     inbins(ff,nf,:)=accumarray(bins(~isnan(val) & bins>0),ones(sum(~isnan(val)& bins>0),1),[no_bins 1],@(x) {x});
@@ -62,19 +58,19 @@ for ff=1:no_fish
                 
                 edges_kds=edges(1:end-1);%(1:end-1)+(edges(2)-edges(1))/2;
                 [hitemp,prob] = idSocial_auxiliaries_kerneldensity(val,edges_kds,kds_bandwidth,method);
-                speeddistribution(ff,nf,:)=hitemp;
+                accdistribution(ff,nf,:)=hitemp;
                 for k=1:no_bins
                     inbins{ff,nf,k}=prob(~isnan(prob(:,k)) & prob(:,k)>0,k);
                 end
                 
             end
-            speed_median(ff,nf)=nanmedian(val);
+            acc_median(ff,nf)=nanmedian(val);
 
 %             [~,locs] = findpeaks(hitemp,'sortstr','descend','npeaks',1);
             [~,locs] = idSocial_auxiliaries_findpeaks(hitemp,'descend',1);
 
             if ~isempty(locs)
-                speed_mode(ff,nf)=edges(locs);
+                acc_mode(ff,nf)=edges(locs);
             end                
             
             
@@ -82,12 +78,12 @@ for ff=1:no_fish
     end
 end
 
-speeddistribution=mat2cell(speeddistribution,ones(1,no_fish),ones(1,no_fish),ones(1,no_bins));
+accdistribution=mat2cell(accdistribution,ones(1,no_fish),ones(1,no_fish),ones(1,no_bins));
 
 %%
 fstack=dbstack(3);
 funcinfo.Function = mfilename;
-if ~isempty(fstack); funcinfo.callerFunction = fstack(1).name; end
+funcinfo.callerFunction = fstack(1).name;
 funcinfo.no_fish = no_fish;
 funcinfo.XTick = edges(1:end-1);
 funcinfo.XTickLabel = cellfun(@(x) strtrim(x),cellstr((num2str(edges(1:end-1)')))','UniformOutput',false);

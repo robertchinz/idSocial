@@ -225,7 +225,7 @@ accdistribution=mat2cell(accdistribution,ones(1,no_fish),ones(1,no_fish),ones(1,
 fstack=dbstack(3);
 funcinfo.Function = mfilename;
 if ~isempty(fstack)
-    funcinfo.callerFunction = fstack(1).name;
+    if ~isempty(fstack); funcinfo.callerFunction = fstack(1).name; end
 end
 funcinfo.no_fish = no_fish;
 funcinfo.XTick = edgesOut;

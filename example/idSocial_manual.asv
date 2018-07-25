@@ -617,12 +617,7 @@ options.order_neighbors = false;
                 % this particular function, but all the data
                 % (all groups/subgroups/trials).
                 % Default: false.
-% options.filter_ ... : All the options starting with "filter_" 
-                % are the same as at the preprocessing stage.
-                % Setting them at the preprocessing stage will
-                % fix them for all later analysis, while setting 
-                % them before calling a function will only effect 
-                % this particular analysis.
+% options.filter_ ... :                 
                 
 % You can get the available options and default values of a 
 % function by calling it without parameters, for example:
@@ -772,7 +767,7 @@ options = []; plot_mode = [];
 options.random_data = false;
 options.timeintervals_in_min = 2; 
 % Choose what to plot 
-plot_mode.xaxis={'Subset'};
+plot_mode.xaxis={'Time'};
 plot_mode.legend= {'Group'};
 % plot_mode.filter={'Group' 1 'Trial' 1 'Focal' 1};
 % Execute function
@@ -810,6 +805,7 @@ options.random_data = false;
 options.timeintervals_in_min = 2; 
 % Choose what to plot 
 plot_mode.xaxis={'Time'};
+plot_mode.legend= {'Group'};
 % Execute function
 data=idSocial_kinematics_Acceleration(data,options,plot_mode);
 %% Acceleration distribution

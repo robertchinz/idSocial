@@ -225,7 +225,7 @@ turningdistribution=mat2cell(turningdistribution,ones(1,no_fish),ones(1,no_fish)
 fstack=dbstack(3);
 funcinfo.Function = mfilename;
 if ~isempty(fstack)
-    if ~isempty(fstack); funcinfo.callerFunction = fstack(1).name; end
+    funcinfo.callerFunction = fstack(1).name;
 end
 funcinfo.no_fish = no_fish;
 funcinfo.XTick = edgesOut;

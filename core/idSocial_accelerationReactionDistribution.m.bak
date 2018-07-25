@@ -1,5 +1,5 @@
-function [turningdistribution, turning_median,turning_mode, turning_ratio,inbins, turning,funcinfo]=idSocial_turningReactionDistribution(tr,edges,angle_range,framerate,bodylength,normalization,method,kds_bandwidth,collapse_left_right,xIsDistance,arena_center)
-% Calculates turning acceleration (component perpendicular to focal's
+function [accdistribution, acc_median,acc_mode, acc_ratio,inbins, acc,funcinfo]=idSocial_accelerationReactionDistribution(tr,edges,angle_range,framerate,bodylength,normalization,method,kds_bandwidth,collapse_left_right,xIsDistance,arena_center)
+% Calculates acceleration acceleration (component perpendicular to focal's
 % direction of movement)
 
 collapse = true;
@@ -34,11 +34,11 @@ if nargin<9 || isempty(collapse_left_right)
 end
 
 if nargin<10 || isempty(xIsDistance)
-    xIsDistance = 'turning';
+    xIsDistance = 'acceleration';
 end
 
 invertY = true;
-[tr,vel,acc,no_frames,no_fish,no_dim] = ...
+[tr,vel,acc2,no_frames,no_fish,no_dim] = ...
     idSocial_auxiliaries_formatInputTrajectory(tr,invertY);
 rand_check = idSocial_auxiliaries_trRandCheck(tr);
 
@@ -74,7 +74,7 @@ if strcmpi(xIsDistance,'distance_from_center') % Change neighbor coordinates to 
     tr(trIsNaN) = NaN; % To recover focal-neighbor filtering.
 end
 
-[focal_to_neighbour_vector_rotated,~,focal_a_rotated]=idSocial_auxiliaries_rotateToFocalSystem(tr,vel,acc);
+[focal_to_neighbour_vector_rotated,~,focal_a_rotated]=idSocial_auxiliaries_rotateToFocalSystem(tr,vel,acc2);
 vel_magn=sqrt(sum(vel.^2,4));
 vel_norm=bsxfun(@rdivide,vel,vel_magn);
 
@@ -102,14 +102,14 @@ end
 
 
 %%
-dim=1;
+dim=2;
 no_bins=size(edges,2)-1;
-turningdistribution=NaN(no_fish,no_fish,no_bins);
-turning_median=NaN(no_fish,no_fish);
-turning_circvar=NaN(no_fish,no_fish);
-turning_ratio=NaN(no_fish,no_fish,no_frames);
-turning=NaN(no_fish,no_fish,no_frames);
-turning_mode=NaN(no_fish,no_fish);
+accdistribution=NaN(no_fish,no_fish,no_bins);
+acc_median=NaN(no_fish,no_fish);
+acc_circvar=NaN(no_fish,no_fish);
+acc_ratio=NaN(no_fish,no_fish,no_frames);
+acc=NaN(no_fish,no_fish,no_frames);
+acc_mode=NaN(no_fish,no_fish);
 inbins=cell(no_fish,no_fish,no_bins);
 
 for ff=1:no_fish
@@ -124,7 +124,7 @@ for ff=1:no_fish
                 distance_vector(sign_distance) = distance_vector(sign_distance)*-1;
             elseif strcmpi(xIsDistance,'left_right')
                 distance_vector = focal_to_neighbour_vector_rotated(:,nf,ff,dim)/bodylength;
-            elseif strcmpi(xIsDistance,'turning')
+            elseif strcmpi(xIsDistance,'acceleration')
                 distance_vector = val;
             end
             
@@ -160,11 +160,11 @@ for ff=1:no_fish
                     edges(edges<0) = [];
                     
                 end
-                turning(ff,nf,1:numel(ttt))= ttt;
+                acc(ff,nf,1:numel(ttt))= ttt;
             else 
                 ttt = val.*sign(distance_vector);
                 ttt = ttt(~isnan(ttt));
-                turning(ff,nf,1:numel(ttt))= ttt;
+                acc(ff,nf,1:numel(ttt))= ttt;
             end
             
             
@@ -179,11 +179,11 @@ for ff=1:no_fish
                 
                 switch normalization
                     case 'density'
-                        turningdistribution(ff,nf,:)=hitemp(1:end-1)/no_frames/(edges(2)-edges(1));
+                        accdistribution(ff,nf,:)=hitemp(1:end-1)/no_frames/(edges(2)-edges(1));
                     case 'no_frames'
-                        turningdistribution(ff,nf,:)=hitemp(1:end-1)/no_frames;
+                        accdistribution(ff,nf,:)=hitemp(1:end-1)/no_frames;
                     case 'none'
-                        turningdistribution(ff,nf,:)=hitemp(1:end-1);
+                        accdistribution(ff,nf,:)=hitemp(1:end-1);
                 end
                 if ~all(bins==0)
                     try
@@ -197,20 +197,20 @@ for ff=1:no_fish
                 
                 edges_kds=edges(1:end-1);%(1:end-1)+(edges(2)-edges(1))/2;
                 [hitemp,prob] = idSocial_auxiliaries_kerneldensity(ttt,edges_kds,kds_bandwidth,method);
-                turningdistribution(ff,nf,:)=hitemp;
+                accdistribution(ff,nf,:)=hitemp;
                 for k=1:no_bins
                     inbins{ff,nf,k}=prob(~isnan(prob(:,k)) & prob(:,k)>0,k);
                 end
                 
             end
-            turning_median(ff,nf)=nanmedian(ttt);
+            acc_median(ff,nf)=nanmedian(ttt);
             
-            turning_circvar(ff,nf)=idSocial_circ_var(ttt);
-            turning_ratio(ff,nf,1:numel(ttt))=ttt;
+            acc_circvar(ff,nf)=idSocial_circ_var(ttt);
+            acc_ratio(ff,nf,1:numel(ttt))=ttt;
             
             [~,locs] = idSocial_auxiliaries_findpeaks(hitemp,'descend',1);
             if ~isempty(locs)
-                turning_mode(ff,nf)=edges(locs);
+                acc_mode(ff,nf)=edges(locs);
             end
             
             edgesOut=edges(1:end-1);
@@ -219,23 +219,23 @@ for ff=1:no_fish
 end
 
 
-turningdistribution=mat2cell(turningdistribution,ones(1,no_fish),ones(1,no_fish),ones(1,no_bins));
+accdistribution=mat2cell(accdistribution,ones(1,no_fish),ones(1,no_fish),ones(1,no_bins));
 
 %%
 fstack=dbstack(3);
 funcinfo.Function = mfilename;
 if ~isempty(fstack)
-    if ~isempty(fstack); funcinfo.callerFunction = fstack(1).name; end
+    funcinfo.callerFunction = fstack(1).name;
 end
 funcinfo.no_fish = no_fish;
 funcinfo.XTick = edgesOut;
 funcinfo.XTickLabel = cellfun(@(x) strtrim(x),cellstr((num2str(edges(1:end-1)')))','UniformOutput',false);
 
 if strcmpi(xIsDistance,'distance_from_center') && no_fishOrig==1
-    turningdistribution = turningdistribution(1,2,:);
+    accdistribution = accdistribution(1,2,:);
     inbins = inbins(1,2,:);
-    turning_median = turning_median(1,2,:);
-    turning_mode = turning_mode(1,2,:);
-    turning_ratio = turning_ratio(1,2,:);
-    turning = turning(1,2,:);
+    acc_median = acc_median(1,2,:);
+    acc_mode = acc_mode(1,2,:);
+    acc_ratio = acc_ratio(1,2,:);
+    acc = acc(1,2,:);
 end

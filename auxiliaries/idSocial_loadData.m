@@ -1,7 +1,11 @@
-function [input_data, options, info]=idSocial_loadData(trajectory, datosegmlist, options)
+function [input_data, options, info]=idSocial_loadData(trajectory, options, datosegmlist)
 % Load trajectories and additional tracking information and
 % apply filters and/or smoothing.
 %
+
+if nargin < 3 || isempty(datosegmlist)
+    datosegmlist =[];
+end
 
 act_path=mfilename('fullpath');
 
@@ -36,7 +40,7 @@ orig_warning_state = warning;
 warning('off','MATLAB:audiovideo:VideoReader:fileNotFound')
 warning('off','MATLAB:nonExistentField')
 input_data=struct();
-if nargin<3 || isempty(options)
+if nargin<2 || isempty(options)
     options=[];
 end
 
@@ -341,7 +345,7 @@ for group=1:no_groups
     for subset=1:no_subsets_act
         no_trials_act=numel(trajectory{group}{subset});
         for trial=1:no_trials_act
-            
+            options{group}{subset}{trial} = handleComboMenus(options{group}{subset}{trial});
             if exist('datosegmlist','var')==1 && ~isempty(datosegmlist) && ~isempty(datosegmlist{group}{subset}) && ~isempty(datosegmlist{group}{subset}{trial}) && ...
                     ischar(datosegmlist{group}{subset}{trial}) && ...
                     exist(datosegmlist{group}{subset}{trial},'file')==2
@@ -675,11 +679,11 @@ for group=1:no_groups
                         disp(['Preprocessing  (' num2str(group) ',' num2str(subset) ',' num2str(trial) ')'])
                         
                         try
-                            probIdCheck = isfinite(options{group}{subset}{trial}.filter_minProbIdentityAssignment) && any(all(isnan(probtrayectorias) | ...
-                                probtrayectorias < options{group}{subset}{trial}.filter_minProbIdentityAssignment,1));
-                            
-                            tr=idSocial_prepareTrajectories3D(trPreOrig,...
-                                probtrayectorias,...
+                                probIdCheck = isfinite(options{group}{subset}{trial}.filter_minProbIdentityAssignment) && any(all(isnan(probtrayectorias) | ...
+                                    probtrayectorias < options{group}{subset}{trial}.filter_minProbIdentityAssignment,1));
+
+                                tr=idSocial_prepareTrajectories3D(trPreOrig,...
+                                    probtrayectorias,...
                                 options{group}{subset}{trial},info.bodylength_in_pixels(group,subset,trial));
 %                             trPreOrig=tr.trajectory;
                             if probIdCheck
